@@ -151,6 +151,7 @@ nav:
       - Quantum solvers:
           - sesolve: python_api/integrators/sesolve.md
           - mesolve: python_api/integrators/mesolve.md
+          - mcsolve: python_api/integrators/mcsolve.md
           - smesolve: python_api/integrators/smesolve.md
           - sepropagator: python_api/integrators/sepropagator.md
           - mepropagator: python_api/integrators/mepropagator.md
@@ -180,6 +181,7 @@ nav:
           - Results:
               - SESolveResult: python_api/result/SESolveResult.md
               - MESolveResult: python_api/result/MESolveResult.md
+              - MCSolveResult: python_api/result/MCSolveResult.md
               - SEPropagatorResult: python_api/result/SEPropagatorResult.md
               - MEPropagatorResult: python_api/result/MEPropagatorResult.md
               - FloquetResult: python_api/result/FloquetResult.md
