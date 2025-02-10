@@ -200,31 +200,32 @@ class DSSESolveEulerMayuramaSolver(DSSEFixedStepSolver):
     def forward(self, t: Scalar, y: DiffusiveState, dW: Array) -> DiffusiveState:
         psi = y.state
         L, H = self.L(t), self.H(t)
-        I = eye_like(H)
 
         # === measurement Y
         # dY = <L+Ld> dt + dW
+        Lpsi = [_L @ psi for _L in L]
         exp = jnp.stack([expect(_L + _L.dag(), psi).real for _L in L])  # (nL)
+        # todo: can be computed with 2 * (psi.dag() @ Lpsi).real
         dY = exp * self.dt + dW
 
         # === state psi
         dpsi = (
-            -1j * H * self.dt
+            -1j * self.dt * H @ psi
             - 0.5
+            * self.dt
             * sum(
                 [
-                    _L.dag() @ _L - _exp * _L + 0.25 * _exp**2 * I
-                    for _L, _exp in zip(L, exp, strict=True)
+                    _L.dag() @ _Lpsi - _exp * _Lpsi + 0.25 * _exp**2 * psi
+                    for _L, _Lpsi, _exp in zip(L, Lpsi, exp, strict=True)
                 ]
             )
-            * self.dt
             + sum(
                 [
-                    (_L - 0.5 * _exp * I) * _dW
-                    for _L, _exp, _dW in zip(L, exp, dW, strict=True)
+                    (_Lpsi - 0.5 * _exp * psi) * _dW
+                    for _L, _Lpsi, _exp, _dW in zip(L, Lpsi, exp, dW, strict=True)
                 ]
             )
-        ) @ psi
+        )
 
         return DiffusiveState(psi + dpsi, y.Y + dY)
 
